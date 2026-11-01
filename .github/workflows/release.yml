@@ -2,8 +2,14 @@ name: Package ForeverLoot
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
+    paths:
+      - '*.lua'
+      - '*.toc'
+      - 'README.md'
+      - 'LICENSE'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -14,21 +20,78 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Build addon zip
+      - name: Read addon version
+        id: version
         shell: bash
         run: |
+          VERSION=$(awk '/^## Version:/ {print $3; exit}' ForeverLoot.toc)
+          if [ -z "$VERSION" ]; then
+            echo "Could not read version from ForeverLoot.toc"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "archive=ForeverLoot-${VERSION}-forever.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether this version already exists
+        id: exists
+        shell: bash
+        run: |
+          TAG='${{ steps.version.outputs.tag }}'
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build WoW Forever package
+        if: steps.exists.outputs.exists == 'false'
+        shell: bash
+        run: |
+          VERSION='${{ steps.version.outputs.version }}'
+          ARCHIVE='${{ steps.version.outputs.archive }}'
           mkdir -p package/ForeverLoot
           cp ForeverLoot.toc *.lua README.md LICENSE package/ForeverLoot/
           cd package
-          zip -r "../ForeverLoot-${GITHUB_REF_NAME}.zip" ForeverLoot
+          zip -r "../${ARCHIVE}" ForeverLoot
+          cd ..
+          cat > release.json <<EOF
+          {
+            "releases": [
+              {
+                "name": "ForeverLoot",
+                "version": "${VERSION}",
+                "filename": "${ARCHIVE}",
+                "nolib": false,
+                "metadata": [
+                  {
+                    "flavor": "forever",
+                    "interface": 16001
+                  }
+                ]
+              }
+            ]
+          }
+          EOF
 
       - name: Create GitHub release
+        if: steps.exists.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
-            "ForeverLoot-${GITHUB_REF_NAME}.zip" \
-            --generate-notes \
-            --title "ForeverLoot ${GITHUB_REF_NAME}"
+          VERSION='${{ steps.version.outputs.version }}'
+          TAG='${{ steps.version.outputs.tag }}'
+          ARCHIVE='${{ steps.version.outputs.archive }}'
+          git tag "$TAG" "$GITHUB_SHA"
+          git push origin "$TAG"
+          gh release create "$TAG" "$ARCHIVE" release.json \
+            --title "ForeverLoot v${VERSION}" \
+            --notes "Automated WoW: Forever release. Includes WowUp release.json metadata and a -forever.zip package."
+
+      - name: Already released
+        if: steps.exists.outputs.exists == 'true'
+        run: echo "Version ${{ steps.version.outputs.version }} already has a release tag; nothing to do."
