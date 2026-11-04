@@ -2,10 +2,11 @@
 ## Title: Forever Loot
 ## Notes: Lightweight dungeon and raid loot browser for World of Warcraft: Forever.
 ## Author: Andy + ChatGPT
-## Version: 0.1.2
+## Version: 0.1.3
 ## SavedVariables: ForeverLootDB
 
 Data.lua
+Static.lua
 Journal.lua
 API.lua
 UI.lua

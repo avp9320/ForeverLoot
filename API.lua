@@ -1,7 +1,25 @@
 local ADDON_NAME, FL = ...
 
 function FL:Rescan()
-    return self.Journal:ScanInstances()
+    local live, err = self.Journal:ScanInstances()
+    live = type(live) == "table" and live or {}
+    local seen, all = {}, {}
+    for _, instance in ipairs(live) do
+        all[#all + 1] = instance
+        seen[self.NormalizeName(instance.displayName or instance.name)] = true
+    end
+    -- Never leave the browser empty just because Forever has no Blizzard EJ.
+    for _, instance in ipairs(self.Static:GetInstances()) do
+        local name = self.NormalizeName(instance.displayName or instance.name)
+        if not seen[name] then
+            all[#all + 1] = instance
+            seen[name] = true
+        end
+    end
+    self.instances = all
+    self.journalStatus = err
+    self.scanError = #all == 0 and (err or "No instance metadata available.") or nil
+    return all, self.scanError
 end
 
 function FL:GetInstances()
@@ -54,7 +72,11 @@ function FL:GetEncounters(instanceOrID)
     if type(instanceOrID) ~= "table" then
         instance = self:GetInstanceByJournalID(instanceOrID)
     end
-    return self.Journal:GetEncounters(instance)
+    if not instance then return {} end
+    if instance.isStatic then return self.Static:GetEncounters(instance) end
+    local live = self.Journal:GetEncounters(instance)
+    if live and #live > 0 then return live end
+    return self.Static:GetEncounters(instance)
 end
 
 function FL:GetInstanceLoot(instanceOrID, encounterID)
@@ -62,7 +84,11 @@ function FL:GetInstanceLoot(instanceOrID, encounterID)
     if type(instanceOrID) ~= "table" then
         instance = self:GetInstanceByJournalID(instanceOrID)
     end
-    return self.Journal:GetLoot(instance, encounterID)
+    if not instance then return {} end
+    if instance.isStatic then return self.Static:GetLoot(instance, encounterID) end
+    local live = self.Journal:GetLoot(instance, encounterID)
+    if live and #live > 0 then return live end
+    return self.Static:GetLoot(instance, encounterID)
 end
 
 function FL:GetLootForMapID(mapID, encounterID)

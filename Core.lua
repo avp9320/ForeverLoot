@@ -16,7 +16,7 @@ end
 
 local function showHelp()
     msg("/fl — open/close Forever Loot")
-    msg("/fl scan — rescan the Encounter Journal")
+    msg("/fl scan — refresh the instance catalog")
     msg("/fl status — show detected instance count and API version")
     msg("/fl api — show integration API version")
 end
@@ -79,7 +79,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         local instances, err = FL:Rescan()
         if err then
             msg("v" .. FL.VERSION .. " loaded. " .. err)
-            msg("Use /fl scan after launch if the journal is still loading.")
+            msg("Use /fl scan to refresh the catalog.")
         else
             msg(string.format("v%s loaded — %d Forever instance%s detected. /fl to browse.", FL.VERSION, #instances, #instances == 1 and "" or "s"))
         end

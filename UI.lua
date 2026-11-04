@@ -169,7 +169,7 @@ function UI:Create()
         UI:RefreshInstances()
     end)
     rescanBtn:SetScript("OnClick", function()
-        UI.status:SetText("Rescanning Encounter Journal...")
+        UI.status:SetText("Refreshing instance catalog...")
         FL:Rescan()
         UI.selectedInstance = nil
         UI.selectedEncounterID = nil
@@ -310,7 +310,8 @@ function UI:RefreshLoot()
 
     self.lootChild:SetHeight(math.max(1, #shown * LOOT_ROW_H))
     local bossText = self.selectedEncounterID and "selected boss" or "all bosses"
-    self.status:SetText(string.format("%s — %d loot item%s (%s).", instance.displayName or instance.name or "Instance", #shown, #shown == 1 and "" or "s", bossText))
+    local coverage = instance.isStatic and "Classic fallback; incomplete drops" or "Forever journal"
+    self.status:SetText(string.format("%s — %d listed item%s (%s; %s).", instance.displayName or instance.name or "Instance", #shown, #shown == 1 and "" or "s", bossText, coverage))
 end
 
 function UI:RefreshAll() self:RefreshInstances(); self:RefreshBosses(); self:RefreshLoot() end
