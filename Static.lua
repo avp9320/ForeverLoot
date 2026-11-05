@@ -39,15 +39,88 @@ Static.bosses = {
     },
     ["the hall of thanes"] = {
         { name = "Faldrim Anvilmar", encounterID = 3493 },
+        -- Client beta metadata calls this encounter Infurnus, but current guides
+        -- call the boss Magmatus. Keep the existing encounter ID mapping.
+        { name = "Magmatus", encounterID = 3495 },
         { name = "Plunder", encounterID = 3494 },
-        { name = "Infurnus", encounterID = 3495 },
         { name = "Durgen Dirgehammer", encounterID = 3496 },
+    },
+    ["ruins of lordaeron"] = {
+        { name = "Witherfang", encounterID = 3353 },
+        { name = "The Butcher", encounterID = 3355 },
+        { name = "The Abandoned", encounterID = 3357 },
+        { name = "Bjork", encounterID = 3412 },
+        { name = "Viktor the Vile", encounterID = 3411 },
+        { name = "Rath'mael", encounterID = 3354 },
+        { name = "Lordaeron Captain", encounterID = 3408 },
     },
 }
 
 -- Confirmed Forever drops will override these by itemID and encounter ID.
 -- The client hides many source/loot-table details until encountered.
 Static.verifiedLoot = {}
+
+-- Reference-sourced Forever loot from the 2026 client item table + published
+-- boss attribution. This is useful but NOT the same as a live confirmed drop.
+-- Source IDs: https://daybreakforever.com/discoveries
+-- Boss attributions: wowhead.com/forever/dungeon-journal/
+-- and method.gg/wow-forever/dungeons/. More sources may be discovered in game.
+Static.foreverBetaLoot = {
+    ["the hall of thanes"] = {
+        [3493] = {
+            {itemID=270227, name="Ephemeral Choker"},
+            {itemID=271096, name="Aetherwisp Bracers"},
+            {itemID=271097, name="Spiritwraith Drape"},
+        },
+        [3495] = {
+            {itemID=270230, name="Kindlegem Girdle"},
+            {itemID=270231, name="Flamefist Grips"},
+            {itemID=271095, name="Fang of Magmatus"},
+        },
+        [3494] = {
+            {itemID=270228, name="Golemheart Stave"},
+            {itemID=270229, name="Treads of the Protector Golem"},
+            {itemID=271098, name="Golemguard Chest"},
+        },
+        [3496] = {
+            {itemID=270256, name="Durgen's Crescent Axe"},
+            {itemID=270260, name="Direhammer Leggings"},
+            {itemID=270261, name="Robes of the Disgraced Thane"},
+        },
+    },
+    ["ruins of lordaeron"] = {
+        [3353] = {
+            {itemID=271201, name="Atrophic Girdle"},
+            {itemID=271202, name="Witherbite Bracers"},
+            {itemID=271203, name="Segmented Spider Leg"},
+        },
+        [3355] = {
+            {itemID=271204, name="Meathook Slicer"},
+            {itemID=271205, name="Abomination Bones"},
+            {itemID=271206, name="Leftover Abomination Skin"},
+        },
+        [3357] = {
+            {itemID=271207, name="Rotmender's Leggings"},
+            {itemID=271208, name="Grip of Fear"},
+            {itemID=271216, name="Scepter of the Abandoned"},
+        },
+        [3412] = {
+            {itemID=271209, name="Bonerust Leggings"},
+            {itemID=271210, name="Tuskwrap Belt"},
+            {itemID=271217, name="Corpse Chopper"},
+        },
+        [3411] = {
+            {itemID=271211, name="Vilewalkers"},
+            {itemID=271212, name="Bloodied Chestwraps"},
+            {itemID=271218, name="Vileblood Scimitar"},
+        },
+        [3354] = {
+            {itemID=271213, name="Mirror of Rath'mael"},
+            {itemID=271214, name="Rotmender's Treads"},
+            {itemID=271215, name="Coldspire Staff"},
+        },
+    },
+}
 
 -- Small sourced launch seed; the suite watch expands this as information
 -- arrives. These item/source pairings are CLASSIC, not guaranteed in Forever.
@@ -88,7 +161,7 @@ function Static:GetInstances()
             maxLevel = meta.maxLevel,
             mapID = mapIDs[key],
             isStatic = true,
-            dataSource = "classic-fallback",
+            dataSource = self.foreverBetaLoot[key] and "forever-beta" or "classic-fallback",
             lootCoverage = "partial",
         }
     end
@@ -104,6 +177,7 @@ function Static:GetLoot(instance, encounterID)
     local key = self:InstanceKey(instance)
     local classic = self.classicLoot[key] or {}
     local verified = self.verifiedLoot[key] or {}
+    local foreverBeta = self.foreverBetaLoot[key] or {}
     local loot, seen = {}, {}
     local function append(entries, source)
         for _, item in ipairs(entries or {}) do
@@ -134,6 +208,7 @@ function Static:GetLoot(instance, encounterID)
         -- Verified Forever entries override the provisional Classic record
         -- when the same item ID appears in both.
         append(verified[id], "forever-verified")
+        append(foreverBeta[id], "forever-reference")
         append(classic[id], "classic-baseline")
     end
     if encounterID then
