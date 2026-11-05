@@ -19,6 +19,7 @@ local function showHelp()
     msg("/fl scan — refresh the instance catalog")
     msg("/fl status — show detected instance count and API version")
     msg("/fl api — show integration API version")
+    msg("/fl learned — count item drops automatically observed in dungeons")
 end
 
 local function slash(input)
@@ -40,6 +41,11 @@ local function slash(input)
         local instances = FL:GetInstances()
         msg(string.format("v%s — API v%d — %d detected instance%s.", FL.VERSION, FL.API_VERSION, #instances, #instances == 1 and "" or "s"))
         if FL.scanError then msg(FL.scanError) end
+    elseif command == "learned" then
+        local zones, items=0,0
+        if FL.Learning then zones,items=FL.Learning:Counts() end
+        msg(string.format("Observed in-game loot: %d unique item%s from %d dungeon%s.",
+            items,items==1 and "" or "s",zones,zones==1 and "" or "s"))
     elseif command == "api" then
         msg("Integration API v" .. tostring(FL.API_VERSION) .. " available at _G.ForeverLoot.")
         msg("ForeverDungeon hook: ForeverLoot:GetLootForMapID(instanceMapID)")
