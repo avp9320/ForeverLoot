@@ -11,6 +11,7 @@ ForeverLoot is meant to do the useful part of AtlasLoot without turning into a g
 - `/fl` opens or closes the browser.
 - Browse **Forever dungeons -> bosses -> loot**.
 - Separate Dungeon / Raid / All filters.
+- Search across instance names, boss names, known loot item names, equipment properties, and item IDs; results reflect only cataloged or observed drops, not every possible drop.
 - Hover items for the normal WoW tooltip.
 - Shift-click an item to link it in chat.
 - Compact window; nothing stays on screen by default.
