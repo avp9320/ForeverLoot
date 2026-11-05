@@ -169,7 +169,20 @@ function Static:GetInstances()
 end
 
 function Static:GetEncounters(instance)
-    local list = self.bosses[self:InstanceKey(instance)] or {}
+    local key=self:InstanceKey(instance)
+    local list,seen={},{}
+    for _, boss in ipairs(self.bosses[key] or {}) do
+        list[#list+1]=boss
+        seen[boss.encounterID]=true
+    end
+    if FL.Learning then
+        for _,boss in ipairs(FL.Learning:GetEncounters(key)) do
+            if not seen[boss.encounterID] then
+                list[#list+1]=boss
+                seen[boss.encounterID]=true
+            end
+        end
+    end
     return list
 end
 
@@ -207,6 +220,7 @@ function Static:GetLoot(instance, encounterID)
     local function forBoss(id)
         -- Verified Forever entries override the provisional Classic record
         -- when the same item ID appears in both.
+        if FL.Learning then append(FL.Learning:GetLoot(key,id), "observed-in-game") end
         append(verified[id], "forever-verified")
         append(foreverBeta[id], "forever-reference")
         append(classic[id], "classic-baseline")
