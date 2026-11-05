@@ -293,6 +293,15 @@ function UI:RefreshLoot()
         if item.slot and item.slot ~= "" then bits[#bits + 1] = item.slot end
         if item.armorType and item.armorType ~= "" then bits[#bits + 1] = item.armorType end
         if item.itemLevel and tonumber(item.itemLevel) and tonumber(item.itemLevel) > 0 then bits[#bits + 1] = "ilvl " .. tostring(item.itemLevel) end
+        -- Provenance is part of the data contract, not decoration. Never make a
+        -- reference item appear to be a drop actually observed by this account.
+        local labels = {
+            ["observed-in-game"] = "Observed drop",
+            ["forever-reference"] = "Forever reference",
+            ["classic-baseline"] = "Classic estimate",
+            ["forever-verified"] = "Verified Forever",
+        }
+        if item.source then bits[#bits + 1] = labels[item.source] or tostring(item.source) end
         details:SetText(table.concat(bits, " • "))
 
         row:SetScript("OnEnter", function(self)
@@ -310,7 +319,10 @@ function UI:RefreshLoot()
 
     self.lootChild:SetHeight(math.max(1, #shown * LOOT_ROW_H))
     local bossText = self.selectedEncounterID and "selected boss" or "all bosses"
-    local coverage = instance.isStatic and "Classic fallback; incomplete drops" or "Forever journal"
+    local coverage = instance.isStatic
+        and (instance.dataSource == "forever-beta" and "Forever reference; incomplete drops"
+            or "Classic fallback; incomplete drops")
+        or "Forever journal"
     self.status:SetText(string.format("%s — %d listed item%s (%s; %s).", instance.displayName or instance.name or "Instance", #shown, #shown == 1 and "" or "s", bossText, coverage))
 end
 
