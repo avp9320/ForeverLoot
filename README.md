@@ -4,7 +4,7 @@ A lightweight dungeon and raid loot browser made specifically for **World of War
 
 ForeverLoot is meant to do the useful part of AtlasLoot without turning into a giant always-open database addon. It opens when you want it, stays out of the way when you don't, and exposes a small API that other Forever addons can use.
 
-## Current build: 0.2.2
+## Current build: 0.2.3
 
 ### Features
 
