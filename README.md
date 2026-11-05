@@ -4,7 +4,7 @@ A lightweight dungeon and raid loot browser made specifically for **World of War
 
 ForeverLoot is meant to do the useful part of AtlasLoot without turning into a giant always-open database addon. It opens when you want it, stays out of the way when you don't, and exposes a small API that other Forever addons can use.
 
-## Current build: 0.2.1
+## Current build: 0.2.2
 
 ### Features
 
@@ -17,7 +17,7 @@ ForeverLoot is meant to do the useful part of AtlasLoot without turning into a g
 - Uses published Forever reference tables for 12 Hall of Thanes, 18 Ruins of Lordaeron, 9 Excavation Site, and 24 City of Dalaran equipment drops (63 reference items total), with boss attribution and item IDs.
 - Automatically learns equippable uncommon-or-better drops from actual dungeon loot and saves observed results account-wide, including in dungeons missing reference tables.
 - Groups newly observed drops under their boss when identifiable, or under "Observed drops (boss unknown)" rather than inventing a source.
-- Reference loot is flagged as provisional; only drops actually seen are marked observed.
+- Reference loot is flagged as provisional; only drops actually seen are marked observed. The browser shows an explicit source label for each item so reference drops cannot masquerade as observed drops.
 - Reads live Encounter Journal data if the client exposes it, but no longer depends on a Journal existing.
 - Whitelists Forever content so unrelated modern-client instances are ignored.
 - Public API for **ForeverDungeon** and future Forever addons.
