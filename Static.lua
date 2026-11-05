@@ -18,6 +18,8 @@ local mapIDs = {
     ["the deadmines"] = 36,
     ["the hall of thanes"] = 3065,
     ["ruins of lordaeron"] = 2999,
+    ["excavation site"] = 2998,
+    ["city of dalaran"] = 2959,
 }
 
 Static.bosses = {
@@ -45,6 +47,24 @@ Static.bosses = {
         { name = "Plunder", encounterID = 3494 },
         { name = "Durgen Dirgehammer", encounterID = 3496 },
     },
+    ["excavation site"] = {
+        -- Synthetic IDs until the live client encounter IDs are confirmed.
+        { name = "Saltspine", encounterID = -58001 },
+        { name = "Shadetooth", encounterID = -58002 },
+        { name = "Highland Horror", encounterID = -58003 },
+        { name = "Relic Guardian", encounterID = -58004 },
+    },
+    ["city of dalaran"] = {
+        { name = "Atrexis the Grave Knight", encounterID = -57001 },
+        { name = "Lyn the Ignored", encounterID = -57002 },
+        { name = "Arcane Anomaly", encounterID = -57003 },
+        { name = "Fel Ancient", encounterID = -57004 },
+        { name = "Arcanic Enigma / Mana Elemental", encounterID = -57005 },
+        { name = "Unstable Sentinel", encounterID = -57006 },
+        { name = "Shade of the Archmage", encounterID = -57007 },
+        { name = "Mana Devourer", encounterID = -57008 },
+        { name = "Mana Wraith", encounterID = -57009 },
+    },
     ["ruins of lordaeron"] = {
         { name = "Witherfang", encounterID = 3353 },
         { name = "The Butcher", encounterID = 3355 },
@@ -66,6 +86,70 @@ Static.verifiedLoot = {}
 -- Boss attributions: wowhead.com/forever/dungeon-journal/
 -- and method.gg/wow-forever/dungeons/. More sources may be discovered in game.
 Static.foreverBetaLoot = {
+    -- Boss/item attribution: https://www.icy-veins.com/wow-forever/
+    -- Client item IDs: https://lvren.fun/en-gb/dungeons/dalaran and
+    -- https://ladderly.gg/forever/loot/excavation-site-wetlands
+    ["excavation site"] = {
+        [-58001] = {
+            {itemID=273022,name="Supple Bellyskin Leggings"},
+            {itemID=273023,name="Saltscale Girdle"},
+            {itemID=273024,name="Glinteye Slippers"},
+        },
+        [-58002] = {
+            {itemID=273025,name="Raptorclaw Greaves"},
+            {itemID=273026,name="Garb of Florid Feathers"},
+            {itemID=273027,name="Raptor's Gaze"},
+        },
+        [-58004] = {
+            {itemID=273028,name="Reliquary Mantle"},
+            -- Golemsight Long Gun 273029 appears in published boss guides;
+            -- verify its client record during a live run.
+            {itemID=273029,name="Golemsight Long Gun"},
+            {itemID=273030,name="Ring of Power Regulation"},
+        },
+    },
+    ["city of dalaran"] = {
+        [-57001] = {
+            {itemID=273036,name="Graveweave Bindings"},
+            {itemID=273032,name="Bonebinder's Signet"},
+            {itemID=273033,name="Gravespike Repeater"},
+        },
+        [-57002] = {
+            {itemID=273054,name="Cartilage Shapers"},
+            {itemID=273053,name="Tendonscraper Dagger"},
+            {itemID=273055,name="Bonepile Gaze"},
+        },
+        [-57003] = {
+            {itemID=273031,name="Runemender's Seal"},
+            {itemID=273034,name="Ephemeral Grips"},
+            {itemID=273035,name="Mana-Warped Chain Shirt"},
+        },
+        [-57004] = {
+            {itemID=273039,name="Blightleaf Rope"},
+            {itemID=273038,name="Garb of Fallen Felbark"},
+            {itemID=273037,name="Felbough Arm"},
+        },
+        [-57005] = {
+            {itemID=273045,name="Drape of Shifting Energy"},
+            {itemID=273044,name="Violet Sorcerer's Robes"},
+            {itemID=273043,name="Wand of Mana Concentration"},
+        },
+        [-57006] = {
+            {itemID=273046,name="Guardian's Dualblade"},
+            {itemID=273048,name="Refractory Scaleguards"},
+            {itemID=273047,name="Unstable Crystalline Shoulderpads"},
+        },
+        [-57007] = {
+            {itemID=273052,name="Ponderous Orb"},
+            {itemID=273049,name="Archmagister's Faceted Pendant"},
+            {itemID=273051,name="Violet Sorcerer's Mantle"},
+        },
+        [-57008] = {
+            {itemID=273040,name="Spine of the Devourer"},
+            {itemID=273042,name="Manascale Treads"},
+            {itemID=273041,name="Slitherwrap Girdle"},
+        },
+    },
     ["the hall of thanes"] = {
         [3493] = {
             {itemID=270227, name="Ephemeral Choker"},
