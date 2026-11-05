@@ -1,7 +1,7 @@
 local ADDON_NAME, FL = ...
 
 _G.ForeverLoot = FL
-FL.VERSION = "0.2.1"
+FL.VERSION = "0.2.2"
 FL.API_VERSION = 1
 
 local function norm(text)
