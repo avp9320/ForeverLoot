@@ -1,0 +1,20 @@
+# v1.0 acceptance checklist
+
+This is a release gate, not a claim of implementation. README claims and static code inspection do not substitute for live-client evidence. Check a box only after its behavior is verified; record test date/client and evidence in this file.
+
+- [ ] Expand sourced boss and item coverage beyond provisional 63 reference items
+- [ ] Live-test automatic observed-drop learning, attribution and account-wide persistence
+- [ ] Verify Journal fallback and public API consumers
+- [ ] Audit reference versus observed versus unknown coverage displays
+- [ ] Verify release packaging and SavedVariables migration
+
+## Evidence
+
+- Code review: pending
+- Automated/static tests: pending
+- Live WoW: Forever client verification: pending
+- Release ZIP and WoWUp installation: pending
+
+## Status
+
+Pre-1.0. Features described in README may be implemented but are not accepted as verified here until tested. Avoid declaring v1.0 solely on version metadata.
