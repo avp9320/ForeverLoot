@@ -200,6 +200,29 @@ function UI:RefreshInstances()
             or (self.filterKind == "dungeon" and not instance.isRaid)
         local name = FL.NormalizeName(instance.displayName or instance.name)
         local queryOkay = query == "" or name:find(query, 1, true)
+        -- A loot browser must also find an instance by its bosses and drops.
+        -- Do not assume a missing item in an incomplete catalog means no drop.
+        if kindOkay and not queryOkay and query ~= "" then
+            for _, encounter in ipairs(FL:GetEncounters(instance) or {}) do
+                if FL.NormalizeName(encounter.name):find(query, 1, true) then
+                    queryOkay = true
+                    break
+                end
+            end
+        end
+        if kindOkay and not queryOkay and query ~= "" then
+            for _, item in ipairs(FL:GetInstanceLoot(instance) or {}) do
+                local searchable = table.concat({
+                    FL.NormalizeName(item.name), FL.NormalizeName(item.slot),
+                    FL.NormalizeName(item.armorType), FL.NormalizeName(item.itemType),
+                    FL.NormalizeName(item.itemSubType), tostring(item.itemID or "")
+                }, " ")
+                if searchable:find(query, 1, true) then
+                    queryOkay = true
+                    break
+                end
+            end
+        end
         if kindOkay and queryOkay then list[#list + 1] = instance end
     end
 
@@ -259,7 +282,7 @@ end
 
 local function itemMatchesQuery(item, query)
     if query == "" then return true end
-    local hay = table.concat({FL.NormalizeName(item.name), FL.NormalizeName(item.slot), FL.NormalizeName(item.armorType), FL.NormalizeName(item.itemType), FL.NormalizeName(item.itemSubType)}, " ")
+    local hay = table.concat({FL.NormalizeName(item.name), FL.NormalizeName(item.slot), FL.NormalizeName(item.armorType), FL.NormalizeName(item.itemType), FL.NormalizeName(item.itemSubType), tostring(item.itemID or "")}, " ")
     return hay:find(query, 1, true) ~= nil
 end
 
