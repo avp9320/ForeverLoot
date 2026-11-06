@@ -68,16 +68,32 @@ function Learning:GetEncounters(key)
     table.sort(list,function(a,b) return a.encounterID < b.encounterID end)
     return list
 end
-local function seededBoss(key,item)
+-- A reference item may be shared by multiple bosses. Never assign an
+-- observed drop to whichever boss pairs() happens to enumerate first.
+-- Prefer a recent successful encounter only when it is a documented source.
+local function seededBoss(key,item,atTime)
     local static=FL.Static
     if not static then return end
+    local sources={}
     for _,data in ipairs({static.verifiedLoot,static.foreverBetaLoot,static.classicLoot}) do
         for bossID,entries in pairs((data and data[key]) or {}) do
-            for _, candidate in ipairs(entries) do
-                if tonumber(candidate.itemID)==item then return bossID end
+            for _,candidate in ipairs(entries) do
+                if tonumber(candidate.itemID)==item then
+                    sources[tostring(bossID)]=bossID
+                    break
+                end
             end
         end
     end
+    local only
+    local count=0
+    for _,bossID in pairs(sources) do count=count+1; only=bossID end
+    if count==1 then return only end
+    if count>1 and recent and recent.key==key and recent.success
+        and atTime-recent.at>=0 and atTime-recent.at<120 then
+        return sources[tostring(recent.id)]
+    end
+    -- Ambiguous shared reference drops remain unknown, not falsely attributed.
 end
 local function bossName(key,id)
     for _,b in ipairs(FL.Static.bosses[key] or {}) do
@@ -116,10 +132,22 @@ local function record(itemID, key, instanceName, atTime)
         return
     end
     if not name then return end
-    local id=seededBoss(key,itemID)
+    local id=seededBoss(key,itemID,atTime)
+    -- A recent kill is useful for unreferenced items, but cannot resolve
+    -- a shared reference drop unless that boss is among its known sources.
     if not id and recent and recent.key==key and recent.success and
         atTime-recent.at>=0 and atTime-recent.at<120 then
-        id=recent.id
+        local hasReference=false
+        for _,data in ipairs({FL.Static.verifiedLoot,FL.Static.foreverBetaLoot,FL.Static.classicLoot}) do
+            for _,entries in pairs((data and data[key]) or {}) do
+                for _,candidate in ipairs(entries) do
+                    if tonumber(candidate.itemID)==itemID then hasReference=true;break end
+                end
+                if hasReference then break end
+            end
+            if hasReference then break end
+        end
+        if not hasReference then id=recent.id end
     end
     id=id or UNKNOWN_BOSS
     local db=getDB()
