@@ -12,6 +12,26 @@ local f = CreateFrame("Frame")
 local function plain(value)
     return value ~= nil and (not issecretvalue or not issecretvalue(value))
 end
+-- CHAT_MSG_LOOT is broadcast for group members as well as the player.
+-- Only self-loot is evidence that this character received an item.
+-- The localized Blizzard templates avoid English-only player-name parsing.
+local function isOwnLoot(message)
+    if not plain(message) or type(message) ~= "string" then return false end
+    for _, key in ipairs({"LOOT_ITEM_SELF", "LOOT_ITEM_SELF_MULTIPLE",
+                           "LOOT_ITEM_PUSHED_SELF", "LOOT_ITEM_PUSHED_SELF_MULTIPLE"}) do
+        local template = _G[key]
+        if plain(template) and type(template) == "string" then
+            local pattern = "^" .. template:gsub("([%^%$%(%)%.%[%]%*%+%-%?])", "%%%1")
+                :gsub("%%%%", "\001")
+                :gsub("%%[%d%.]*%$?s", ".+")
+                :gsub("%%[%d%.]*%$?d", "%%d+")
+                :gsub("\001", "%%%%") .. "$"
+            local ok, matched = pcall(string.match, message, pattern)
+            if ok and matched then return true end
+        end
+    end
+    return false
+end
 local function instance()
     if type(GetInstanceInfo) ~= "function" then return end
     local ok, name, kind = pcall(GetInstanceInfo)
@@ -142,7 +162,7 @@ f:SetScript("OnEvent",function(_,event,...)
     end
     if event=="CHAT_MSG_LOOT" then
         local message=...
-        if not plain(message) or type(message)~="string" then return end
+        if not isOwnLoot(message) then return end
         local id=tonumber(message:match("|Hitem:(%d+)"))
         if not id then return end
         local key,instanceName=instance()
