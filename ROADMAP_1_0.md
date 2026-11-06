@@ -19,3 +19,8 @@ This is a release gate, not a claim of implementation. README claims and static 
 ## Status
 
 Pre-1.0. Features described in README may be implemented but are not accepted as verified here until tested. Avoid declaring v1.0 solely on version metadata.
+
+## Phase 1 — observed-loot ownership (2026-11-05)
+
+- [x] `Learning.lua` `isOwnLoot` filters `CHAT_MSG_LOOT` through localized Blizzard self-loot and pushed-self-loot templates before learning an item (commit `326c9c4`). Group members' loot no longer creates false account-wide observations. Unknown formats are ignored instead of assumed personal. SavedVariables schema unchanged.
+- [ ] Verify solo and party loot, self-loot stack counts, pushed quest rewards, localized formats, secret message values, and observed-drop persistence in the live Forever client. Static code inspection only; no Lua harness or live-client test.
