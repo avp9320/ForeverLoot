@@ -24,3 +24,8 @@ Pre-1.0. Features described in README may be implemented but are not accepted as
 
 - [x] `Learning.lua` `isOwnLoot` filters `CHAT_MSG_LOOT` through localized Blizzard self-loot and pushed-self-loot templates before learning an item (commit `326c9c4`). Group members' loot no longer creates false account-wide observations. Unknown formats are ignored instead of assumed personal. SavedVariables schema unchanged.
 - [ ] Verify solo and party loot, self-loot stack counts, pushed quest rewards, localized formats, secret message values, and observed-drop persistence in the live Forever client. Static code inspection only; no Lua harness or live-client test.
+
+## Phase 1 — shared-drop boss attribution (2026-11-05)
+
+- [x] `Learning.lua` now deduplicates reference sources by boss ID instead of assigning a shared drop to the first boss encountered in unordered `pairs()` iteration. A unique reference source is attributed directly; a shared source requires a recent successful encounter that matches a documented source; otherwise it remains in the unknown-boss bucket (commit `7776325`). Unreferenced drops retain the existing recent-encounter inference. No SavedVariables migration.
+- [ ] Static Lua parsing/regression and live-client verification pending: shared reference drop after each eligible boss, unrelated recent boss, no recent encounter, and a uniquely sourced drop. This is code implementation, not verified client behavior.
